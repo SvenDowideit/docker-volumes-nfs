@@ -52,7 +52,7 @@ func (g garbageDriver) Mount(r volumeapi.VolumeRequest) volumeapi.VolumeResponse
 	//if err := ioutil.WriteFile(filepath.Join(p, "test"), []byte("TESTTEST"), 0644); err != nil {
 	//fmt.Printf("wrote %s\n", filepath.Join(p, "test"))
 	// if err := run("mount", "--bind", "/data/ISOs", p); err != nil {
-	if err := run("mount", source, p); err != nil {
+	if err := run("mount", "-o", "port=2049,nolock,proto=tcp", source, p); err != nil {
 		return volumeapi.VolumeResponse{Err: err}
 	}
 

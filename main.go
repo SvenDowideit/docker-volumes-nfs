@@ -14,11 +14,11 @@ import (
 )
 
 const (
-	nfsId       = "_nfs"
-	socketAddress = "/usr/share/docker/plugins/nfs.sock"
+	pluginId       = "nfs"
 )
 var (
-        defaultDir = filepath.Join(dkvolume.DefaultDockerRootDirectory, nfsId)
+	socketAddress = filepath.Join("/usr/share/docker/plugins/", strings.Join([]string{pluginId, ".sock"}, ""))
+        defaultDir = filepath.Join(dkvolume.DefaultDockerRootDirectory, strings.Join([]string{"_", pluginId}, ""))
         root       = flag.String("root", defaultDir, "NFS volumes root directory")
 )
 
@@ -54,8 +54,8 @@ func (g nfsDriver) Mount(r dkvolume.Request) dkvolume.Response {
 		return dkvolume.Response{Err: err.Error()}
 	}
 
-	//if err := ioutil.WriteFile(filepath.Join(p, "test"), []byte("TESTTEST"), 0644); err != nil {
-	//fmt.Printf("wrote %s\n", filepath.Join(p, "test"))
+	// if err := ioutil.WriteFile(filepath.Join(p, "test"), []byte("TESTTEST"), 0644); err != nil {
+	// fmt.Printf("wrote %s\n", filepath.Join(p, "test"))
 	// if err := run("mount", "--bind", "/data/ISOs", p); err != nil {
 	if err := run("mount", "-o", "port=2049,nolock,proto=tcp", source, p); err != nil {
 		return dkvolume.Response{Err: err.Error()}

@@ -17,6 +17,12 @@ To use the plugin when mounting an NFS export `nfs://127.0.0.1:/data`, run:
 
 > Note: because of the way docker parses colons, you need to omit them from the NFS share.
 
+## Build and run in Boot2Docker qemu VM
+
+`make iso` will build an experimental boot2docker ISO which will auto-start the nfs volume-plugin.
+
+If you're on Linux, you can run it in Qemu-kvm using `make run`.
+
 ## License
 
 MIT

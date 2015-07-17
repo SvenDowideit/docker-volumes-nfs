@@ -1,4 +1,4 @@
-package volumeapi
+package dkvolume
 
 import (
 	"crypto/tls"
@@ -21,7 +21,8 @@ import (
 // https://github.com/docker/docker/blob/master/api/server/unix_socket.go
 // https://github.com/docker/docker/blob/master/api/server/tcp_socket.go
 
-type TlsConfig struct {
+// TLSConfig is the structure that represents the TLS configuration.
+type TLSConfig struct {
 	CA          string
 	Certificate string
 	Key         string
@@ -49,20 +50,20 @@ func newUnixSocket(path, group string, activate <-chan struct{}) (net.Listener, 
 	return l, nil
 }
 
-func newTcpSocket(addr string, config *TlsConfig, activate <-chan struct{}) (net.Listener, error) {
+func newTCPSocket(addr string, config *TLSConfig, activate <-chan struct{}) (net.Listener, error) {
 	l, err := listenbuffer.NewListenBuffer("tcp", addr, activate)
 	if err != nil {
 		return nil, err
 	}
 	if config != nil {
-		if l, err = setupTls(l, config); err != nil {
+		if l, err = setupTLS(l, config); err != nil {
 			return nil, err
 		}
 	}
 	return l, nil
 }
 
-func setupTls(l net.Listener, config *TlsConfig) (net.Listener, error) {
+func setupTLS(l net.Listener, config *TLSConfig) (net.Listener, error) {
 	tlsCert, err := tls.LoadX509KeyPair(config.Certificate, config.Key)
 	if err != nil {
 		if os.IsNotExist(err) {

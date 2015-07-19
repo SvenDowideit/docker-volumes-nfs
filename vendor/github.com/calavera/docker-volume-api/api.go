@@ -29,6 +29,7 @@ const (
 // Request is the structure that docker's requests are deserialized to.
 type Request struct {
 	Name string
+	Id   string
 }
 
 // Response is the strucutre that the plugin's responses are serialized to.

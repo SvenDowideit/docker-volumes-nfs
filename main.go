@@ -38,11 +38,12 @@ func (g nfsDriver) Remove(r dkvolume.Request) dkvolume.Response {
 
 func (g nfsDriver) Path(r dkvolume.Request) dkvolume.Response {
 	fmt.Printf("Path %v\n", r)
-	return dkvolume.Response{Mountpoint: filepath.Join(g.root, r.Name)}
+	return dkvolume.Response{Mountpoint: filepath.Join(g.root, r.Id, r.Name)}
 }
 
 func (g nfsDriver) Mount(r dkvolume.Request) dkvolume.Response {
-	p := filepath.Join(g.root, r.Name)
+	fmt.Printf("Mount %v\n", r)
+	p := filepath.Join(g.root, r.Id, r.Name)
 
 	v := strings.Split(r.Name, "/")
 	v[0] = v[0]+":"
@@ -65,15 +66,18 @@ func (g nfsDriver) Mount(r dkvolume.Request) dkvolume.Response {
 }
 
 func (g nfsDriver) Unmount(r dkvolume.Request) dkvolume.Response {
-	p := filepath.Join(g.root, r.Name)
+	fmt.Printf("Unmount %v\n", r)
+	p := filepath.Join(g.root, r.Id, r.Name)
 	fmt.Printf("Unmount %s\n", p)
 
 	if err := run("umount", p); err != nil {
 		return dkvolume.Response{Err: err.Error()}
 	}
 
-	err := os.RemoveAll(p)
-	return dkvolume.Response{Err: err.Error()}
+	if err := os.RemoveAll(p); err != nil {
+		return dkvolume.Response{Err: err.Error()}
+	}
+	return dkvolume.Response{}
 }
 
 

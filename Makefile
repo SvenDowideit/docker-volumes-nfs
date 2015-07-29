@@ -11,7 +11,7 @@ run:
 
 containerrun:
 	docker run --rm -it --privileged \
-		-v /usr/share/docker/plugins/:/usr/share/docker/plugins/ \
+		-v /run/docker/plugins:/run/docker/plugins \
 		-v /var/lib/docker/volumes/:/var/lib/docker/volumes \
 		-v /data:/data \
 		docker-volumes-nfs

@@ -6,10 +6,10 @@ Docker volume extension that NFS mounts a remote FS into your container
 
 ## Usage
 
-`make build` to build the container
+`make build` to build the container which contains the plugin binary.
 
-`make run` to run the volume plugin in a container, listening to the socket in the default
-`/usr/share/docker/plugins/` dir.
+`make containerrun` to run the volume plugin in a container, listening to the socket in the default
+`/run/docker/plugins/` dir.
 
 To use the plugin when mounting an NFS export `nfs://127.0.0.1:/data`, run:
 

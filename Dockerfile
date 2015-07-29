@@ -10,3 +10,5 @@ COPY . /go/src/app
 WORKDIR /go/src/app
 RUN go-wrapper download
 RUN go-wrapper install
+RUN go build
+ENTRYPOINT ["./app"]

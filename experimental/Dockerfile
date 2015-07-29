@@ -1,4 +1,4 @@
-FROM boot2docker
+FROM boot2docker/boot2docker
 
 ENV LOCALBIN $ROOTFS/usr/local/bin/
 
@@ -9,7 +9,7 @@ RUN curl -L -o $LOCALBIN/docker https://experimental.docker.com/builds/Linux/x86
 # add the magic nfs volume driver
 ADD ./docker-volume-nfs $LOCALBIN/docker-volume-nfs
 # Create the plugins socket dir
-RUN mkdir -p $ROOTFS/usr/share/docker/plugins
+RUN mkdir -p $ROOTFS/run/docker/plugins
 # TODO: should test to see if there is one, and merge
 ADD ./bootsync.sh $ROOTFS/var/lib/boot2docker/bootsync.sh
 

@@ -14,12 +14,13 @@ import (
 )
 
 const (
-	pluginId       = "nfs"
+	pluginId = "nfs"
 )
+
 var (
-	socketAddress = filepath.Join("/usr/share/docker/plugins/", strings.Join([]string{pluginId, ".sock"}, ""))
-        defaultDir = filepath.Join(dkvolume.DefaultDockerRootDirectory, strings.Join([]string{"_", pluginId}, ""))
-        root       = flag.String("root", defaultDir, "NFS volumes root directory")
+	socketAddress = filepath.Join("/run/docker/plugins/", strings.Join([]string{pluginId, ".sock"}, ""))
+	defaultDir    = filepath.Join(dkvolume.DefaultDockerRootDirectory, strings.Join([]string{"_", pluginId}, ""))
+	root          = flag.String("root", defaultDir, "NFS volumes root directory")
 )
 
 type nfsDriver struct {
@@ -45,7 +46,7 @@ func (g nfsDriver) Mount(r dkvolume.Request) dkvolume.Response {
 	p := filepath.Join(g.root, r.Name)
 
 	v := strings.Split(r.Name, "/")
-	v[0] = v[0]+":"
+	v[0] = v[0] + ":"
 	source := strings.Join(v, "/")
 
 	fmt.Printf("Mount %s at %s\n", source, p)
@@ -76,8 +77,6 @@ func (g nfsDriver) Unmount(r dkvolume.Request) dkvolume.Response {
 	return dkvolume.Response{Err: err.Error()}
 }
 
-
-
 func main() {
 	d := nfsDriver{*root}
 	h := dkvolume.NewHandler(d)
@@ -90,15 +89,14 @@ var (
 )
 
 func run(exe string, args ...string) error {
-        cmd := exec.Command(exe, args...)
-        if verbose {
-                cmd.Stdout = os.Stdout
-                cmd.Stderr = os.Stderr
-                fmt.Printf("executing: %v %v", exe, strings.Join(args, " "))
-        }
-        if err := cmd.Run(); err != nil {
-                return err
-        }
-        return nil
+	cmd := exec.Command(exe, args...)
+	if verbose {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		fmt.Printf("executing: %v %v", exe, strings.Join(args, " "))
+	}
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return nil
 }
-

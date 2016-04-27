@@ -10,7 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/calavera/docker-volume-api"
+	//"github.com/calavera/docker-volume-api"
+	"github.com/docker/go-plugins-helpers/volume"
 )
 
 const (
@@ -18,8 +19,9 @@ const (
 )
 
 var (
-	socketAddress = filepath.Join("/run/docker/plugins/", strings.Join([]string{pluginId, ".sock"}, ""))
-	defaultDir    = filepath.Join(dkvolume.DefaultDockerRootDirectory, strings.Join([]string{"_", pluginId}, ""))
+	socketDir = "/run/docker/plugins/"
+	socketAddress = filepath.Join(socketDir, strings.Join([]string{pluginId, ".sock"}, ""))
+	defaultDir    = filepath.Join(volume.DefaultDockerRootDirectory, strings.Join([]string{"_", pluginId}, ""))
 	root          = flag.String("root", defaultDir, "NFS volumes root directory")
 )
 
@@ -27,22 +29,32 @@ type nfsDriver struct {
 	root string
 }
 
-func (g nfsDriver) Create(r dkvolume.Request) dkvolume.Response {
+func (g nfsDriver) Create(r volume.Request) volume.Response {
 	fmt.Printf("Create %v\n", r)
-	return dkvolume.Response{}
+	return volume.Response{}
 }
 
-func (g nfsDriver) Remove(r dkvolume.Request) dkvolume.Response {
+func (g nfsDriver) Remove(r volume.Request) volume.Response {
 	fmt.Printf("Remove %v\n", r)
-	return dkvolume.Response{}
+	return volume.Response{}
 }
 
-func (g nfsDriver) Path(r dkvolume.Request) dkvolume.Response {
+func (g nfsDriver) Path(r volume.Request) volume.Response {
 	fmt.Printf("Path %v\n", r)
-	return dkvolume.Response{Mountpoint: filepath.Join(g.root, r.Name)}
+	return volume.Response{Mountpoint: filepath.Join(g.root, r.Name)}
 }
 
-func (g nfsDriver) Mount(r dkvolume.Request) dkvolume.Response {
+func (g nfsDriver) Get(r volume.Request) volume.Response {
+	fmt.Printf("Get %v\n", r)
+	return volume.Response{}
+}
+
+func (g nfsDriver) List(r volume.Request) volume.Response {
+	fmt.Printf("List %v\n", r)
+	return volume.Response{}
+}
+
+func (g nfsDriver) Mount(r volume.Request) volume.Response {
 	p := filepath.Join(g.root, r.Name)
 
 	v := strings.Split(r.Name, "/")
@@ -52,34 +64,34 @@ func (g nfsDriver) Mount(r dkvolume.Request) dkvolume.Response {
 	fmt.Printf("Mount %s at %s\n", source, p)
 
 	if err := os.MkdirAll(p, 0755); err != nil {
-		return dkvolume.Response{Err: err.Error()}
+		return volume.Response{Err: err.Error()}
 	}
 
 	// if err := ioutil.WriteFile(filepath.Join(p, "test"), []byte("TESTTEST"), 0644); err != nil {
 	// fmt.Printf("wrote %s\n", filepath.Join(p, "test"))
 	// if err := run("mount", "--bind", "/data/ISOs", p); err != nil {
 	if err := run("mount", "-o", "port=2049,nolock,proto=tcp", source, p); err != nil {
-		return dkvolume.Response{Err: err.Error()}
+		return volume.Response{Err: err.Error()}
 	}
 
-	return dkvolume.Response{Mountpoint: p}
+	return volume.Response{Mountpoint: p}
 }
 
-func (g nfsDriver) Unmount(r dkvolume.Request) dkvolume.Response {
+func (g nfsDriver) Unmount(r volume.Request) volume.Response {
 	p := filepath.Join(g.root, r.Name)
 	fmt.Printf("Unmount %s\n", p)
 
 	if err := run("umount", p); err != nil {
-		return dkvolume.Response{Err: err.Error()}
+		return volume.Response{Err: err.Error()}
 	}
 
 	err := os.RemoveAll(p)
-	return dkvolume.Response{Err: err.Error()}
+	return volume.Response{Err: err.Error()}
 }
 
 func main() {
 	d := nfsDriver{*root}
-	h := dkvolume.NewHandler(d)
+	h := volume.NewHandler(d)
 	fmt.Printf("listening on %s\n", socketAddress)
 	fmt.Println(h.ServeUnix("root", socketAddress))
 }

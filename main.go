@@ -89,6 +89,11 @@ func (g nfsDriver) Unmount(r volume.Request) volume.Response {
 	return volume.Response{Err: err.Error()}
 }
 
+func (g nfsDriver) Capabilities(r volume.Request) volume.Response {
+  fmt.Printf("Capabilities %v\n", r)
+  return volume.Response{Capabilities: volume.Capability{Scope: "global"}}
+}
+
 func main() {
 	d := nfsDriver{*root}
 	h := volume.NewHandler(d)

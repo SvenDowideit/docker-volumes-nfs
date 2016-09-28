@@ -54,7 +54,7 @@ func (g nfsDriver) List(r volume.Request) volume.Response {
 	return volume.Response{}
 }
 
-func (g nfsDriver) Mount(r volume.Request) volume.Response {
+func (g nfsDriver) Mount(r volume.MountRequest) volume.Response {
 	p := filepath.Join(g.root, r.Name)
 
 	v := strings.Split(r.Name, "/")
@@ -77,7 +77,7 @@ func (g nfsDriver) Mount(r volume.Request) volume.Response {
 	return volume.Response{Mountpoint: p}
 }
 
-func (g nfsDriver) Unmount(r volume.Request) volume.Response {
+func (g nfsDriver) Unmount(r volume.UnmountRequest) volume.Response {
 	p := filepath.Join(g.root, r.Name)
 	fmt.Printf("Unmount %s\n", p)
 
@@ -87,6 +87,11 @@ func (g nfsDriver) Unmount(r volume.Request) volume.Response {
 
 	err := os.RemoveAll(p)
 	return volume.Response{Err: err.Error()}
+}
+
+func (g nfsDriver) Capabilities(r volume.Request) volume.Response {
+  fmt.Printf("Capabilities %v\n", r)
+  return volume.Response{Capabilities: volume.Capability{Scope: "global"}}
 }
 
 func main() {
